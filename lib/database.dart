@@ -20,7 +20,7 @@ class Usuario extends TableElement{
 
   @override
   void createTable(Database db) {
-    db.rawUpdate("CREATE TABLE ${TABLE_NAME}(_id integer primary key autoincrement, title varchar(30))");
+    db.rawUpdate("CREATE TABLE ${TABLE_NAME}(_id integer primary key autoincrement, title text NOT NULL UNIQUE)");
   }
 
   @override
@@ -82,7 +82,7 @@ class DatabaseHelper {
     var dbClient = await db;
 
     element.id = await dbClient.insert(element.tableName, element.toMap());
-    print("new Id ${element.id}");
+    print("nuevo id  ${element.id}");
     return element;
   }
   Future<int> delete(TableElement element) async {
