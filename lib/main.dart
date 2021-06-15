@@ -94,18 +94,13 @@ class HomeState extends State<Home> {
                   child: Text("Guardar"),
                   onPressed: () async {
                     Navigator.of(context).pop();
-                   bool i = await _databaseHelper.existeCorreo(nNombre.correo);
-                  // print(i);
-
-                   //print(i?_showAlert("EL NUMERO YA EXISTE"):"");
+                   bool i = await _databaseHelper.existeUsuario(nNombre.celular, nNombre.correo);
                     if(i==false){
                       _databaseHelper.insert(nNombre).then((value) {
-                      
                        updateList();
                      });
                     }else{
-                     // print("existe");
-                         _showAlert("EL CORREO YA EXISTE");
+                         _showAlert("EL USUARIO YA EXISTE");
                     }
                   },
                 )
@@ -155,30 +150,32 @@ Widget _showAlert(String text){
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Modificar"),
-            content: Column(
-              children: [
-                TextField(
-                  controller: controller,
-                  onChanged: (value) {
-                    nNombre.nombre = value;
-                  },
-                  decoration: InputDecoration(labelText: "nombre:"),
-                ),
-                TextField(
-                  controller: correo,
-                  onChanged: (value) {
-                    nNombre.correo = value;
-                  },
-                  decoration: InputDecoration(labelText: "correo:"),
-                ),
-                TextField(
-                  controller: celular,
-                  onChanged: (value) {
-                    nNombre.celular = value;
-                  },
-                  decoration: InputDecoration(labelText: "celular:"),
-                ),
-              ],
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: controller,
+                    onChanged: (value) {
+                      nNombre.nombre = value;
+                    },
+                    decoration: InputDecoration(labelText: "nombre:"),
+                  ),
+                  TextField(
+                    controller: correo,
+                    onChanged: (value) {
+                      nNombre.correo = value;
+                    },
+                    decoration: InputDecoration(labelText: "correo:"),
+                  ),
+                  TextField(
+                    controller: celular,
+                    onChanged: (value) {
+                      nNombre.celular = value;
+                    },
+                    decoration: InputDecoration(labelText: "celular:"),
+                  ),
+                ],
+              ),
             ),
 
             actions: <Widget>[

@@ -22,7 +22,7 @@ class Usuario extends TableElement{
 
   @override
   void createTable(Database db) {
-    db.rawUpdate("CREATE TABLE ${TABLE_NAME}(_id integer primary key autoincrement, nombre text ,correo text NOT NULL UNIQUE,celular text NOT NULL UNIQUE)");
+    db.rawUpdate("CREATE TABLE ${TABLE_NAME}(_id integer primary key autoincrement, nombre VARCHAR(50) ,correo VARCHAR(50) NOT NULL UNIQUE,celular VARCHAR(10) NOT NULL UNIQUE)");
   }
 
   @override
@@ -35,18 +35,13 @@ class Usuario extends TableElement{
   }
 
 }
-
-
 final String DB_FILE_NAME = "crub.db";
-
 class DatabaseHelper {
   static final DatabaseHelper _instance = new DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;
   DatabaseHelper._internal();
 
   Database _database;
-
-
   Future<Database> get db async {
     if (_database != null) {
       return _database;
@@ -87,9 +82,10 @@ class DatabaseHelper {
   int exists = Sqflite.firstIntValue(result);
   return exists == 1;
 }
-  Future<bool> existeCorreo(String correo ) async {
+  Future<bool> existeUsuario(String celular,String correo ) async {
     var result =  await _database.rawQuery(
-        "select exists(select 1 from  usuario  where correo=\'"+correo+"\')");
+        "select exists(select 1 from  usuario  where celular=\'" 
++ celular+"\'" +" OR correo=\'"+correo+"\')");
   //var result = await _database.rawQuery(
     //'SELECT EXISTS(SELECT 1 FROM usuario WHERE correo=$correo)',
   //);
