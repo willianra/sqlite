@@ -94,7 +94,7 @@ class HomeState extends State<Home> {
                   child: Text("Guardar"),
                   onPressed: () async {
                     Navigator.of(context).pop();
-                   bool i = await _databaseHelper.existe(nNombre.celular);
+                   bool i = await _databaseHelper.existeCorreo(nNombre.correo);
                   // print(i);
 
                    //print(i?_showAlert("EL NUMERO YA EXISTE"):"");
@@ -105,7 +105,7 @@ class HomeState extends State<Home> {
                      });
                     }else{
                      // print("existe");
-                         _showAlert("EL NUMERO YA EXISTE");
+                         _showAlert("EL CORREO YA EXISTE");
                     }
                   },
                 )

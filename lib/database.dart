@@ -87,12 +87,21 @@ class DatabaseHelper {
   int exists = Sqflite.firstIntValue(result);
   return exists == 1;
 }
+  Future<bool> existeCorreo(String correo ) async {
+    var result =  await _database.rawQuery(
+        "select exists(select 1 from  usuario  where correo=\'"+correo+"\')");
+  //var result = await _database.rawQuery(
+    //'SELECT EXISTS(SELECT 1 FROM usuario WHERE correo=$correo)',
+  //);
+  int exists = Sqflite.firstIntValue(result);
+  return exists == 1;
+}
 
   Future<TableElement> insert(TableElement element) async {
     var dbClient = await db;
 
     element.id = await dbClient.insert(element.tableName, element.toMap());
-    print(element.id==null?"errro":"registro exitoso");
+    print(element.id==null?"error":"registro exitoso");
     return element;
   }
   Future<int> delete(TableElement element) async {
