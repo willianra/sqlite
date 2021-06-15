@@ -8,6 +8,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,6 +31,7 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   List<Usuario> _list;
   DatabaseHelper _databaseHelper;
+    final estado = new TextEditingController( );
 
   @override
   Widget build(BuildContext context) {
@@ -56,35 +58,78 @@ class HomeState extends State<Home> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Nuevo"),
-            content: TextField(
-              onChanged: (value) {
-                nNombre.title = value;
-              },
-              decoration: InputDecoration(labelText: "Título:"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Cancelar"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+          return SingleChildScrollView(
+            child: AlertDialog(
+              title: Text("Nuevo"),
+              content: Column(
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      nNombre.nombre = value;
+                    },
+                    decoration: InputDecoration(labelText: "NOMBRE:"),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      nNombre.correo = value;
+                    },
+                    decoration: InputDecoration(labelText: "CORREO:"),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      nNombre.celular = value;
+                    },
+                    decoration: InputDecoration(labelText: "celular:"),
+                  ),
+                ],
               ),
-              FlatButton(
-                child: Text("Guardar"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _databaseHelper.insert(nNombre).then((value) {
-                    updateList();
-                  });
-                },
-              )
-            ],
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("Cancelar"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
+                  child: Text("Guardar"),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                   bool i = await _databaseHelper.existeUsuario(nNombre.celular, nNombre.correo);
+                    if(i==false){
+                      _databaseHelper.insert(nNombre).then((value) {
+                       updateList();
+                     });
+                    }else{
+                         _showAlert("EL USUARIO YA EXISTE");
+                    }
+                  },
+                )
+              ],
+            ),
           );
         });
   }
-
+Widget _showAlert(String text){
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("ERROR!!"),
+          content: new Text(text),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Cerrar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+}
   void onDeletedRequest(int index) {
     Usuario usuario = _list[index];
     _databaseHelper.delete(usuario).then((value) {
@@ -96,20 +141,43 @@ class HomeState extends State<Home> {
 
   void onUpdateRequest(int index) {
     Usuario nNombre = _list[index];
-    final controller = TextEditingController(text: nNombre.title);
+    final controller = TextEditingController(text: nNombre.nombre);
+    final correo = TextEditingController(text: nNombre.correo);
+    final celular = TextEditingController(text: nNombre.celular);
 
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Modificar"),
-            content: TextField(
-              controller: controller,
-              onChanged: (value) {
-                nNombre.title = value;
-              },
-              decoration: InputDecoration(labelText: "Título:"),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: controller,
+                    onChanged: (value) {
+                      nNombre.nombre = value;
+                    },
+                    decoration: InputDecoration(labelText: "nombre:"),
+                  ),
+                  TextField(
+                    controller: correo,
+                    onChanged: (value) {
+                      nNombre.correo = value;
+                    },
+                    decoration: InputDecoration(labelText: "correo:"),
+                  ),
+                  TextField(
+                    controller: celular,
+                    onChanged: (value) {
+                      nNombre.celular = value;
+                    },
+                    decoration: InputDecoration(labelText: "celular:"),
+                  ),
+                ],
+              ),
             ),
+
             actions: <Widget>[
               FlatButton(
                 child: Text("Cancelar"),
@@ -130,7 +198,6 @@ class HomeState extends State<Home> {
           );
         });
   }
-
   Widget _getBody() {
     if (_list == null) {
       return CircularProgressIndicator();
@@ -141,7 +208,7 @@ class HomeState extends State<Home> {
           itemCount: _list.length,
           itemBuilder: (BuildContext context, index) {
             Usuario usuario = _list[index];
-            return CiudadWidget(
+            return UsuariosWidget(
                 usuario, onDeletedRequest, index, onUpdateRequest);
           });
     }
@@ -166,12 +233,12 @@ class HomeState extends State<Home> {
 typedef OnDeleted = void Function(int index);
 typedef OnUpdate = void Function(int index);
 
-class CiudadWidget extends StatelessWidget {
+class UsuariosWidget extends StatelessWidget {
   final Usuario usuario;
   final OnDeleted onDeleted;
   final OnUpdate onUpdate;
   final int index;
-  CiudadWidget(this.usuario, this.onDeleted, this.index, this.onUpdate);
+  UsuariosWidget(this.usuario, this.onDeleted, this.index, this.onUpdate);
 
   @override
   Widget build(BuildContext context) {
@@ -181,9 +248,17 @@ class CiudadWidget extends StatelessWidget {
         padding: EdgeInsets.all(10),
         child: Row(
           children: <Widget>[
+            Container(),
             Expanded(
-              child: Text(usuario.title),
+              child: Text(usuario.nombre  ),
             ),
+            Expanded(
+              child: Text(usuario.correo),
+            ),
+            Expanded(
+              child: Text(usuario.celular),
+            ),
+
             IconButton(
               icon: Icon(
                 Icons.edit,
