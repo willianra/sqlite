@@ -11,21 +11,23 @@ abstract class TableElement{
 
 class Usuario extends TableElement{
   static final String TABLE_NAME = "usuario";
-  String title;
+  String nombre;
+  String correo;
+  String celular;
 
-  Usuario({this.title, id}):super(id, TABLE_NAME);
+  Usuario({this.nombre, id,this.correo,this.celular}):super(id, TABLE_NAME);
   factory Usuario.fromMap(Map<String, dynamic> map){
-    return Usuario(title: map["title"], id: map["_id"]);
+    return Usuario(nombre: map["nombre"], id: map["_id"],correo: map["correo"],celular:map["celular"]);
   }
 
   @override
   void createTable(Database db) {
-    db.rawUpdate("CREATE TABLE ${TABLE_NAME}(_id integer primary key autoincrement, title text NOT NULL UNIQUE)");
+    db.rawUpdate("CREATE TABLE ${TABLE_NAME}(_id integer primary key autoincrement, nombre text ,correo text NOT NULL UNIQUE,celular text NOT NULL UNIQUE)");
   }
 
   @override
   Map<String, dynamic> toMap() {
-   var map = <String, dynamic>{"title":this.title};
+   var map = <String, dynamic>{"nombre":this.nombre , "correo":this.correo,"celular":this.celular};
    if(this.id != null){
      map["_id"] = id;
    }
@@ -74,15 +76,23 @@ class DatabaseHelper {
     Database dbClient = await db;
 
     List<Map> maps = await dbClient.query(Usuario.TABLE_NAME,
-        columns: ["_id", "title"]);
+        columns: ["_id", "nombre","correo","celular"]);
 
     return maps.map((i)=> Usuario.fromMap(i)).toList();
   }
+  Future<bool> existe(String celular ) async {
+  var result = await _database.rawQuery(
+    'SELECT EXISTS(SELECT 1 FROM usuario WHERE celular=$celular)',
+  );
+  int exists = Sqflite.firstIntValue(result);
+  return exists == 1;
+}
+
   Future<TableElement> insert(TableElement element) async {
     var dbClient = await db;
 
     element.id = await dbClient.insert(element.tableName, element.toMap());
-    print("nuevo id  ${element.id}");
+    print(element.id==null?"errro":"registro exitoso");
     return element;
   }
   Future<int> delete(TableElement element) async {
